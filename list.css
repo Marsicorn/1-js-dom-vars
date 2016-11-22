@@ -1,0 +1,13 @@
+/*Badigina Irina*/
+
+.people{
+  width: 30%;
+  min-width: fit-content;
+  margin: auto;
+  border-radius: 50%;
+}
+
+.people * {
+  display: block;
+  margin: 5px;
+}
