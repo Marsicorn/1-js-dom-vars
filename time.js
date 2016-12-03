@@ -1,74 +1,69 @@
 //Badigina Irina
-//мне стыдно за именование, но иногда я просто не могу подобрать слов
-
 'use strict';
 
-const posProp = ['year', 'month', 'date', 'hours', 'minutes', 'seconds'];
+class Clock {
+    constructor(date = new Date, format = ['hour', 'minute', 'second']) {
+        if (date instanceof Date) this.time = date;
+        else {
+            if (date instanceof Array) format = date;
+            this.time = new Date;
+        }
 
-function Clock(arg1, arg2) {
-  if (arg1) {
-    if (arg1 instanceof Date) { //got date
-      this.time = arg1;
-      if (arg2) { //got prop
-        this.prop = arg2;
-      }
-      else {  //default prop
-        this.prop = ['hours', 'minutes', 'seconds'];
-      }
-    } else  {//default date, got prop
-      this.prop = arg1;
-      this.time = new Date();
+        this.setTimeFormat(format);
+
+        let clockId = document.querySelectorAll('.clock').length;
+        document.querySelector('.content').innerHTML +=
+            '<div class=\"clock\" id=\"clock' + clockId +
+            '\"><div class=\"clock__value\"></div></div>';
+
+        this.printTimeFormat(clockId);
+        setInterval(this.getTime.bind(this, clockId), 1000);
+    };
+
+    getTime(clockId) {
+        this.time.setSeconds(this.time.getSeconds() + 1);
+        document.querySelector('#clock' + clockId + ' > .clock__value')
+            .textContent =
+            this.time.toLocaleString("ru", this.format);
+    };
+
+    printTimeFormat(clockId) {
+        let timeFormat = '[ ';
+        for (let component in this.format) {
+            timeFormat += component + ' ';
+        }
+        timeFormat += ']';
+        document.querySelector('#clock' + clockId).innerHTML += '<div class=\"clock__format\">' + timeFormat +  '</div>';
     }
-  } else { //default date, default prop
-    this.time =  new Date();
-    this.prop = ['hours', 'minutes', 'seconds'];
-  }
 
-  //separators
-  this.dm = ((this.prop.indexOf('date') >= 0 & this.prop.indexOf('month') >= 0) ?
-              '.' : ' ');
-  this.my = ((this.prop.indexOf('year') >= 0 & this.prop.indexOf('month') >= 0) ?
-              '.' : ' ');
-  this.hm = ((this.prop.indexOf('hours') >= 0 & this.prop.indexOf('minutes') >= 0) ?
-              ':' : ' ');
-  this.ms = ((this.prop.indexOf('seconds') >= 0 & this.prop.indexOf('minutes') >= 0) ?
-              ':' : ' ');
-}
+    setTimeFormat(format) {
+        let options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric'
+        };
 
-Clock.prototype = {
-  runClock: function() {
-    this.time.setSeconds(this.time.getSeconds() + 1);
+        for (let component in options) {
+            if (format.indexOf(component) < 0)
+                delete options[component];
+        }
 
-    document.querySelector('.clock').textContent = '';
+        if (Object.keys(options).length == 0)
+            this.format = {
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric'
+            };
+        else this.format = options;
+    }
+};
 
-    if (this.prop.indexOf('date') >= 0)
-      document.querySelector('.clock').textContent += this.time.getDate();
+let clock0 = new Clock(new Date('December 17, 1995 03:59:55'));
+let clock1 = new Clock(['second', 'minute']);
+let clock2 = new Clock(['second', 'month', 'day', 'minute'], new Date);
+let clock3 = new Clock(['hahahaha']);
+let clock4 = new Clock();
 
-    if (this.prop.indexOf('month') >= 0)
-      document.querySelector('.clock').textContent += this.dm + (this.time.getMonth() + 1);
-
-    if (this.prop.indexOf('year') >= 0)
-      document.querySelector('.clock').textContent += this.my + (1900 + this.time.getYear());
-
-    if (this.prop.indexOf('hours') >= 0)
-      document.querySelector('.clock').textContent += ' ' + this.time.getHours();
-
-    if (this.prop.indexOf('minutes') >= 0)
-      document.querySelector('.clock').textContent += this.hm + this.time.getMinutes();
-
-    if (this.prop.indexOf('seconds') >= 0)
-      document.querySelector('.clock').textContent += this.ms + this.time.getSeconds();
-  },
-  stopClock: function() {
-    clearInterval(this.interval);
-  }
-}
-
-var clock1 = new Clock //tests
-(new Date('December 17, 1995 03:59:55'), ['year',  'hours', 'minutes']);
-// (['hours', 'seconds']);
-// (new Date(2014, 6, 14), ['year', 'month', 'seconds']);
-// ();
-
-clock1.runClock();
-setInterval(clock1.runClock.bind(clock1), 1000);
