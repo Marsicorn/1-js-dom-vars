@@ -4,10 +4,16 @@
   width: 30%;
   min-width: fit-content;
   margin: auto;
-  border-radius: 50%;
 }
 
-.people * {
+.name,
+.age,
+.job,
+.salary {
   display: block;
   margin: 5px;
+}
+
+.salary:after {
+  content: '$';
 }
